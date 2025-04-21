@@ -686,3 +686,13 @@ zoom: 1.2
 <br>
 
 ##### Multimodality in LLMs related slides are based on a [blog post by Sebastian Raschka](https://magazine.sebastianraschka.com/p/understanding-multimodal-llms)
+
+---
+
+# Use cases of multimodal LLMs
+
+<center>
+<figure>
+  <img src="/multimodal_llm_2.png" style="width: 750px !important;">
+</figure>
+</center>
