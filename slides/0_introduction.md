@@ -678,7 +678,7 @@ zoom: 1.2
 
 <center>
 <figure>
-  <img src="/multimodal_llm_1.png" style="width: 750px !important;">
+  <img src="/multimodal_llm_1.png" style="width: 550px !important;">
 </figure>
 </center>
 <br>
@@ -693,6 +693,6 @@ zoom: 1.2
 
 <center>
 <figure>
-  <img src="/multimodal_llm_2.png" style="width: 750px !important;">
+  <img src="/multimodal_llm_2.png" style="width: 550px !important;">
 </figure>
 </center>
