@@ -12,6 +12,19 @@
 
 ---
 
+# What is Large Language Model (LLM)?
+
+* Scaled up versions of Transformer architecture, e.g. millions/billions of parameters
+* Typically pretrained on massive amounts of “general” textual data (e.g. web corpus)
+* Training objective is typically “next token prediction”: $P(W_{t+1} | W_t, W_{t-1}, ..., W_1)$
+* Emergent abilities as they scale up (e.g. chain-of-thought reasoning)
+* Heavy computational cost (time, money, GPUs)
+* Larger general ones: “plug-and-play” with few or zero-shot learning
+  * Train once, then adapt to other tasks without needing to retrain
+  * E.g. in-context learning and prompting
+
+---
+
 # How "Large" are Large Language Models?
 
 #### Today we are mainly dealing with two types of models:
@@ -355,6 +368,28 @@ Perplexity is the standard evaluation metric for language models. Perplexity is 
 
 ---
 
+# How to Evaluate LLM?
+
+* **Perplexity** was first introduced 1977 by a team of IBM researchers working on speech recognition
+<br>
+<center>
+  <figure>
+    <img src="/Perplexity_1.png" style="width: 520px !important;">
+      <figcaption style="color:#b3b3b3ff; font-size: 11px; position: absolute"><br>Table from the original paper:
+      <a href="https://pubs.aip.org/asa/jasa/article/62/S1/S63/642598/Perplexity-a-measure-of-the-difficulty-of-speech">Perplexity—a measure of the difficulty of speech recognition tasks</a>
+    </figcaption>
+  </figure>
+</center>
+<br>
+<br>
+
+* $\mathrm{Perplexity} = e^{H(P, Q)} = e^{-\frac{1}{N}\sum_{i=1}^N \log q(w_i)}$
+
+* Perplexity, then, is essentially a measure of how many options the model finds plausible on average, with lower values indicating fewer options (more confident predictions) and higher values indicating more options (greater uncertainty)
+
+##### Based on [https://www.comet.com/site/blog/perplexity-for-llm-evaluation/](https://www.comet.com/site/blog/perplexity-for-llm-evaluation/)
+---
+
 # Chain-of-Thought Prompting
 
 <br>
@@ -384,3 +419,255 @@ Perplexity is the standard evaluation metric for language models. Perplexity is 
 
 * [**PaLM**](https://arxiv.org/pdf/2204.02311) (Pathways Language Model) - designed to optimize learning across multiple TPUs
 * [**LaMDA**](https://arxiv.org/abs/2201.08239) (Language Model for Dialogue Applications) - LLM developed by Google specifically for dialog applications
+
+---
+
+# Chain-of-Thought Limitations
+
+* Error propagation: one wrong step leads to accumulated error
+* Circuit structure constraint: search width constraints
+* Uncertainty: greedy decoding does not consider the global optimality of the sequence
+  * It selects locally optimal tokens at each step without considering how this choice will affect future steps
+
+<br>
+<div class="grid grid-cols-[2fr_2fr_2fr] gap-12">
+<div>
+```
+Q: Calculate (2+3)*5
+A:
+Calculate 2+3, we get 6
+6*5 = 30
+The final answer is 30.
+```
+
+#### Accumulated error
+</div>
+<div>
+```
+Q: Can 1,2,3,4 get 24 in game 24?
+A:
+1+2 = 3
+3*3 = 9
+9+4 = 13
+13 != 24
+So 1,2,3,4 cannot get 24 in game 24.
+```
+
+#### Search width constraint
+</div>
+<div>
+```
+Q: What is 1+2+...+6?
+A:
+1+2 = 3
+3+3 = 6
+6+4 = 10
+10+5 = 15
+15+6 = 21
+So 1+2+3+4+5+6 = 21.
+```
+
+#### True, but not optimal
+</div>
+</div>
+
+---
+
+# Fine-Tuning Problems
+
+* Conventional LLM fine-tuning methods often involve **updating a large number of parameters** of a pretrained model
+  * What to do?
+<div class="grid grid-cols-[4fr_3fr] gap-12">
+<div>
+
+* Let's use [**LoRA**](https://arxiv.org/abs/2106.09685) (Low-Rank Adaptation)<br> for a more focused approach:
+  * Layer-by-layer fine-tuning:
+    * Initial layers are frozen
+    * Subsequent layers are updated
+  * Adapter-based fine-tuning:
+    * Lightweight “adapter” modules<br> together with LLMs containing<br> task-specific customizations
+</div>
+<div>
+  <figure>
+    <img src="/LoRA_1.svg" style="width: 350px !important;">
+      <figcaption style="color:#b3b3b3ff; font-size: 11px; position: absolute"><br>Image source:
+      <a href="https://arxiv.org/abs/1902.00751">arXiv:1902.00751</a>
+    </figcaption>
+  </figure>
+<br>
+
+##### Architecture of the adapter module<br> and its integration with the Transformer
+</div>
+</div>
+
+---
+
+# LoRA approach
+
+* LoRA is a reparameterization method
+* LoRA reduces the dimensions of the matrices to be trained by dividing them so that when multiplied they give the original matrix
+* The weights that are changed are the weights of the reduced matrices, not the original matrix
+
+<br>
+
+<figure>
+  <img src="/LoRA.png" style="width: 850px !important;">
+        <figcaption style="color:#b3b3b3ff; font-size: 11px; position: absolute"><br>Image source:
+      <a href="https://bhavinjawade.github.io/post/lora/">Bhavin Jawade's blog</a>
+    </figcaption>
+</figure>
+
+---
+
+# LoRA approach
+
+* Significant reduction in trained parameters, resulting in faster and more efficient fine-tuning
+
+* Retention of the original pre-trained weights, allowing multiple lightweight models to be used for different tasks
+
+* Comparable performance to fully tuned models in many tasks
+
+---
+zoom: 1.2
+---
+
+# Mixture of Experts (MoE)
+
+<br>
+
+* Popular (now ubiquitous?) approach in LLMs:
+  * DeepSeek
+  * Grok
+  * Mistral AI
+  * GPT-4+ (?)
+
+<br>
+<br>
+<br>
+<br>
+
+##### MoE related slides are based on a [lecture slides by Tatsunori Hashimoto](https://github.com/stanford-cs336/spring2024-lectures/tree/main/nonexecutable)
+
+---
+
+# Idea of Mixture of Experts?
+
+* Replace big feedforward with (many) big feedforward networks and a selector layer
+* You can increase the # experts without affecting performance
+<br>
+<br>
+<br>
+<figure>
+  <img src="/MoE_1.svg" style="width: 950px !important;">
+        <figcaption style="color:#b3b3b3ff; font-size: 11px; position: absolute"><br>Image source:
+      <a href="https://arxiv.org/pdf/2209.01667">arXiv:2209.01667</a>
+    </figcaption>
+</figure>
+
+---
+
+# Why are MoEs getting popular?
+
+<div class="grid grid-cols-[3fr_4fr] gap-12">
+<div>
+  <br>
+  <br>
+  <br>
+<figure>
+  <img src="/MoE_1.png" style="width: 950px !important;">
+</figure>
+<br>
+<center>
+
+#### Faster to train
+</center>
+</div>
+<div>
+<figure>
+  <img src="/MoE_2.png" style="width: 950px !important;">
+</figure>
+<br>
+<center>
+
+#### Parallelizable to many devices
+</center>
+</div>
+</div>
+
+---
+
+# Some recent MoE results
+
+<br>
+<div class="grid grid-cols-[3fr_5fr] gap-12">
+<div>
+  <br>
+<figure>
+  <img src="/MoE_3.png" style="width: 950px !important;">
+</figure>
+</div>
+<div>
+<figure>
+  <img src="/MoE_4.png" style="width: 950px !important;">
+</figure>
+</div>
+</div>
+<br>
+<center>
+
+#### MoEs are most of the highest-performance open models, and are quite quick
+</center>
+
+---
+
+# What MoEs generally look like
+
+<div class="grid grid-cols-[5fr_2fr] gap-12">
+<div>
+  <br>
+  <br>
+  <br>
+<figure>
+  <img src="/MoE_5.png" style="width: 950px !important;">
+</figure>
+<br>
+<center>
+
+#### Typical: replace MLP with MoE layer ([arXiv:2306.04640](https://arxiv.org/pdf/2306.04640))
+</center>
+</div>
+<div>
+<figure>
+  <img src="/MoE_6.png" style="width: 950px !important;">
+</figure>
+<br>
+<center>
+
+#### Less common: MoE for attention heads ([arXiv:2404.07413](https://arxiv.org/pdf/2404.07413))
+</center>
+</div>
+</div>
+
+---
+
+# Recent variations of MoE
+<center>
+<figure>
+  <img src="/MoE_7.png" style="width: 750px !important;">
+</figure>
+</center>
+<br>
+
+#### Smaller, larger number of experts + a few shared experts that are always on
+
+---
+
+# Transformers are not only LLMs
+
+* **LLMs**: GPT-4o, o3, DeepSeek, Claude, Gemini, Llama, etc.
+* **Vision**: CLIP, Segment Anything, DINOv2
+* **Speech**: Whisper, Voicebox
+* **Biology**: AlphaFold-3
+* **Video**: Sora, Runway, Pika
+* **Robotics**: RT-2, Code as Policies
+* And so much more!
