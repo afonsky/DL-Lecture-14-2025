@@ -696,3 +696,13 @@ zoom: 1.2
   <img src="/multimodal_llm_2.png" style="width: 550px !important;">
 </figure>
 </center>
+
+---
+
+# Common approaches to building multimodal LLMs
+
+<center>
+<figure>
+  <img src="/multimodal_llm_3.png" style="width: 550px !important;">
+</figure>
+</center>
