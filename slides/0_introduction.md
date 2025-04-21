@@ -671,3 +671,18 @@ zoom: 1.2
 * **Video**: Sora, Runway, Pika
 * **Robotics**: RT-2, Code as Policies
 * And so much more!
+
+---
+
+# Multimodal LLMs
+
+<center>
+<figure>
+  <img src="/multimodal_llm_1.png" style="width: 750px !important;">
+</figure>
+</center>
+<br>
+<br>
+<br>
+
+##### Multimodality in LLMs related slides are based on a [blog post by Sebastian Raschka](https://magazine.sebastianraschka.com/p/understanding-multimodal-llms)
